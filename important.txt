@@ -1,0 +1,18 @@
+function convertToBinary(rgb) {
+  let binary = "";
+  let value;
+  let key;
+
+  for(let i = 0; i < 3; i += 1) {
+    key = Object.keys(rgb)[i];
+    value = rgb[key].toString(2);
+    binary += value;
+  }
+
+  return binary;
+}
+
+bucket1.beginPath();
+bucket1.rect(0, 0, 256, 256);
+bucket1.fillStyle = sample;
+bucket1.fill();

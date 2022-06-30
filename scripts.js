@@ -1,5 +1,7 @@
 const img = new Image();
 img.src = "./shark.png";
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
 // const imgAddress = document.getElementById("link");
 // img.crossOrigin = "Anonymous";
@@ -16,16 +18,16 @@ img.src = "./shark.png";
 // };
 
 img.onload = () => {
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
   ctx.drawImage(img, 0, 0, img.width, img.height);
   const imgData = ctx.getImageData(0, 0, img.width, img.height);
   // console.log(getTotalRGB(imgData));
   // console.log(getAverageColor(imgData));
   // console.log(getPercentRGB(imgData));
-  console.log(getIndividualPixels(ctx, imgData));
+  // console.log(convertToBinary(getIndividualPixels(ctx, imgData)[0]));
+  // console.log(getColorPalette(imgData));
 
   displayAverage(imgData);
+  displayPercents(imgData);
 };
 
 function getTotalRGB(imgData) {
@@ -56,8 +58,8 @@ function getPercentRGB(imageData) {
 
   return {
     r: percentRed,
-    b: percentBlue,
     g: percentGreen,
+    b: percentBlue,
   };
 }
 
@@ -75,8 +77,20 @@ function getAverageColor(imgData) {
   };
 }
 
-function getColorPalette(ctx, img) {
+function getColorPalette(imgData) {
+  const pixels = getIndividualPixels(ctx, imgData);
+  let rgb;
+  let list = [];
 
+  for (let i = 0; i < pixels.length; i += 1) {
+    list.push(convertToBinary(pixels[i]));
+  }
+
+  list.sort(function (a, b) {
+    return b - a;
+  });
+
+  return list;
 }
 
 function getIndividualPixels(ctx, img) {
@@ -89,14 +103,28 @@ function getIndividualPixels(ctx, img) {
     for (let y = 1; y < img.height; y += 1) {
       pixelData = ctx.getImageData(x, y, x, y);
       const pixel = {
-        "r": pixelData.data[0],
-        "g": pixelData.data[1],
-        "b": pixelData.data[2],
+        r: pixelData.data[0],
+        g: pixelData.data[1],
+        b: pixelData.data[2],
       };
       pixels.push(pixel);
     }
   }
   return pixels;
+}
+
+function convertToBinary(rgb) {
+  let binary = "";
+  let value;
+  let key;
+
+  for (let i = 0; i < 3; i += 1) {
+    key = Object.keys(rgb)[i];
+    value = rgb[key].toString(2);
+    binary += parseInt(value);
+  }
+
+  return binary;
 }
 
 // ----------- display on page ------------------- //
@@ -111,4 +139,45 @@ function displayAverage(imgData) {
   context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
   context.fill();
 }
-// img.src = "./shark.png";
+
+function displayPercents(imgData) {
+  const rgb = getPercentRGB(imgData);
+  const data = Object.values(rgb);
+  console.log(rgb);
+
+    const width = 200;
+    const height = 200;
+    const pieGen = d3.pie();
+    const arcData = pieGen(data);
+
+
+    // Make a scale to set the color
+    const colorScale = d3
+      .scaleQuantize()
+      .domain([0, 2])
+      .range(["red", "green", "blue"]);
+
+    const arcGen = d3
+      .arc() // Make an arc generator
+      .innerRadius(0) // Set the inner radius
+      .outerRadius(100) // Set the outer radius
+      .padAngle(0.00); // Set the gap between arcs
+
+    // Select the SVG
+    const svg = d3.select("#percents");
+
+    // Append a group (<g>) to hold the arcs
+    const pieGroup = svg
+      .append("g")
+      // position the group in the center
+      .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+    const piePath = pieGroup
+      .selectAll("path") // Select all paths
+      .data(arcData) // Use the arc data
+      .enter()
+      .append("path") // Make a path for each arc segment
+      .attr("d", arcGen) // Draw the arc segement with the generator
+      .attr("fill", (d, i) => colorScale(i)); // Use the color scale
+
+}
