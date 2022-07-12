@@ -1,7 +1,9 @@
 const img = new Image();
-img.src = "./shark.png";
+img.src = "./castle.png";
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const width = canvas.width;
+const height = canvas.height;
 
 // const imgAddress = document.getElementById("link");
 // img.crossOrigin = "Anonymous";
@@ -18,8 +20,8 @@ const ctx = canvas.getContext("2d");
 // };
 
 img.onload = () => {
-  ctx.drawImage(img, 0, 0, img.width, img.height);
-  const imgData = ctx.getImageData(0, 0, img.width, img.height);
+  ctx.drawImage(img, 0, 0, width, height);
+  const imgData = ctx.getImageData(0, 0, width, height);
   // console.log(getTotalRGB(imgData));
   // console.log(getAverageColor(imgData));
   // console.log(getPercentRGB(imgData));
@@ -135,7 +137,7 @@ function displayAverage(imgData) {
 
   // console.log(context);
   context.beginPath();
-  context.rect(0, 0, 256, 256);
+  context.rect(0, 0, width, height);
   context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
   context.fill();
 }
@@ -179,5 +181,75 @@ function displayPercents(imgData) {
       .append("path") // Make a path for each arc segment
       .attr("d", arcGen) // Draw the arc segement with the generator
       .attr("fill", (d, i) => colorScale(i)); // Use the color scale
-
 }
+
+function displaySinglePixelPercents(pixelData) {
+  const data = Object.values(pixelData);
+
+    const width = 200;
+    const height = 200;
+    const pieGen = d3.pie();
+    const arcData = pieGen(data);
+
+
+    // Make a scale to set the color
+    const colorScale = d3
+      .scaleQuantize()
+      .domain([0, 2])
+      .range(["red", "green", "blue"]);
+
+    const arcGen = d3
+      .arc() // Make an arc generator
+      .innerRadius(0) // Set the inner radius
+      .outerRadius(100) // Set the outer radius
+      .padAngle(0.00); // Set the gap between arcs
+
+    // Select the SVG
+    const svg = d3.select("#single");
+
+    // Append a group (<g>) to hold the arcs
+    const pieGroup = svg
+      .append("g")
+      // position the group in the center
+      .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+    const piePath = pieGroup
+      .selectAll("path") // Select all paths
+      .data(arcData) // Use the arc data
+      .enter()
+      .append("path") // Make a path for each arc segment
+      .attr("d", arcGen) // Draw the arc segement with the generator
+      .attr("fill", (d, i) => colorScale(i)); // Use the color scale
+}
+
+function displaySelected(rgb) {
+  const selected = document.getElementById("pixel");
+  const context = selected.getContext("2d");
+  const red = rgb.data[0];
+  const green = rgb.data[1];
+  const blue = rgb.data[2];
+
+
+  context.rect(0, 0, 256, 256);
+  context.fillStyle = `rgb(${red}, ${green}, ${blue})`;
+  context.fill();
+}
+
+function getPixel(x, y) {
+  const pixelData = ctx.getImageData(x, y, x, y);
+  console.log(pixelData);
+  const percents = getPercentRGB(pixelData);
+  displaySelected(pixelData);
+  displaySinglePixelPercents(percents);
+}
+
+const getCursorPosition = (canvas, event) => {
+  const x = event.offsetX
+  const y = event.offsetY
+  getPixel(x, y);
+  // console.log(x, y)
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  getCursorPosition(canvas, e)
+})
