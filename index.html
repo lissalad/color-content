@@ -18,10 +18,10 @@
     </div> -->
 
     <h1 class="text-3xl pt-7 md:pb-9">Image Color Content</h1>
-    <div class="flex flex-row w-full justify-center my-4 flex-wrap">
+    <div class="flex flex-row w-full items-center justify-center my-4 flex-wrap">
       <div>
         <!-- ----- IMAGE ---- -->
-        <canvas class="mx-6" id="canvas" width="300" height="300"></canvas>
+        <canvas class="mx-6 shadow-xl" id="canvas" width="300" height="300"></canvas>
       </div>
 
       <!-- ------ SELECTED PIXEL -------- -->
@@ -37,19 +37,19 @@
         </div>
         <div class="flex flex-col items-center space-y-2">
           <h3>pixel rgb makeup</h2>
-            <svg class="md:w-full" height="200" width="200" id="single"></svg>
+            <svg class="border-2 border-slate-300 rounded-full" height="200" width="200" id="single"></svg>
         </div>
       </div>
 
     <!-- ------- IMAGE SUMMARY ----------- -->
-    <div class="flex flex-row items-end space-y-10 mx-12 space-x-9 md:flex-col md:items-center md:space-x-0">
-      <div class="flex flex-col items-center space-y-0">
+    <div class="flex flex-row items-end space-y-6 mx-12 space-x-9 md:flex-col md:items-center md:space-x-0">
+      <div class="flex flex-col items-center space-y-2">
           <h3 class="text-center">average color</h2>
-          <canvas class="md:w-full w-14" id="average-color" width="100" height="100"></canvas>
+          <canvas class="border-2 border-slate-300 md:w-full w-14" id="average-color" width="100" height="100"></canvas>
           </div>
           <div class="flex flex-col items-center space-y-2">
             <h3>total rgb makeup</h2>
-            <svg height="200" width="200" id="percents"></svg>
+            <svg class="border-2 border-slate-300 rounded-full" height="200" width="200" id="percents"></svg>
          </div>
         </div>
     </div>
