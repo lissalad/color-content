@@ -1,5 +1,5 @@
 const img = new Image();
-img.src = "./images/white.png";
+img.src = "./images/betta.png";
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const width = canvas.width;
@@ -9,7 +9,9 @@ img.onload = () => {
   ctx.drawImage(img, 0, 0, width, height);
   const imgData = ctx.getImageData(0, 0, width, height);
 
-  // console.log(getTotalRGB(imgData));
+  console.log(getPercentRGB(imgData));
+  console.log(getAverageColor(imgData));
+
   displayAverage(imgData);
   displayPercents(imgData);
 };
